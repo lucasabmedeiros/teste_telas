@@ -17,6 +17,7 @@ LiquidCrystal lcd(2, 3, 11, 10, 9, 8);
 byte tela_atual = TELA_INICIO;
 byte botao_porta[4] = {PORTA_UP, PORTA_DOWN, PORTA_ENTER, PORTA_BACK};
 byte botao_estado[4] = {0};
+byte posicao_seta = 1;
 
 String texto_inicio[2] = 
 {
@@ -51,8 +52,7 @@ void escolher_tela(void)
     	tela_inicio();
     	break;
     case TELA_MENU1:
-    	lcd.setCursor(0, 0);
-    	lcd.print("          ");
+    	tela_menu(1);
      	break;
   }
 }
@@ -65,4 +65,26 @@ void tela_inicio(void)
  
   if (digitalRead(botao_porta[INDICE_ENTER]) == HIGH)
     tela_atual = TELA_MENU1;
+}
+void tela_menu(byte tela)
+{
+  if (tela == 1)
+  {
+    lcd.setCursor(2, 0);
+    lcd.print("Ver sensores  ");
+    lcd.setCursor(2, 1);
+    lcd.print("Ver potenciom ");
+  }
+  if (tela == 2)
+  {
+    lcd.setCursor(2, 0);
+    lcd.print("Historico     ");
+    lcd.setCursor(2, 1);
+    lcd.print("Configuracoes ");
+  }
+  
+  lcd.setCursor(0, posicao_seta);
+  lcd.print("> ");
+  lcd.setCursor(0, !posicao_seta);
+  lcd.print("  ");
 }
