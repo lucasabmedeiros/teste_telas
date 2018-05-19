@@ -13,17 +13,9 @@
 #define DOWN 2      //NUMEROS
 #define ENTER 3     //ARBITRARIOS
 #define BACK 4      //
+#define NUM_SENSOR 4
 
-void tela_escolha(t_eeprom ep);
-bool ler_botao(void);
-void tela_inicio(void);
-void tela_menu_inicial(int escolha);
-
-byte botao_porta[4] = {UP, DOWN, ENTER, BACK};
-bool botao_estado[4];   // informa se um botao esta ou nao ligado
-byte posicao_seta = 0;
-
-typedef struct st_eeprom
+typedef struct t_eeprom
 {
     int contador;
     int tolerancia;
@@ -32,15 +24,26 @@ typedef struct st_eeprom
     byte tela_atual;    // adicionado para utilizar as telas
 }t_eeprom;
 
-LiquidCrystal lcd = {5, 6, 7, 8, 9, 10} // numeros arbitrarios
+
+void tela_escolha(t_eeprom ep);
+bool ler_botao(void);
+void tela_inicio(void);
+void tela_menu_inicial(int escolha);
+
+
+byte botao_porta[4] = {UP, DOWN, ENTER, BACK};
+bool botao_estado[4];   // informa se um botao esta ou nao ligado
+byte posicao_seta = 0;
+
+LiquidCrystal lcd(2, 3, 11, 10, 9, 8); // numeros arbitrarios
 
 
 void setup()
 {
   t_eeprom ep;
 
-  lcd.begin();
-  lcd.nocursor();   // nao eh necessario mostrar o cursor na tela
+  lcd.begin(16, 2);
+  lcd.noCursor();   // nao eh necessario mostrar o cursor na tela
 
   pinMode(botao_porta[UP], INPUT);
   pinMode(botao_porta[DOWN], INPUT);
@@ -52,7 +55,7 @@ void setup()
 
 void loop()
 {
-  t_eeprom ep
+  t_eeprom ep;
   tela_escolha(ep);
 }
 void tela_escolha(t_eeprom ep)
@@ -65,7 +68,7 @@ void tela_escolha(t_eeprom ep)
       break;
     case TELA_MENU_INICIAL1:
     case TELA_MENU_INICIAL2:
-      tela_menu_inicial(ep.tela_atual);
+      tela_menu_inicial();
       break;
   }
 }
@@ -91,14 +94,15 @@ bool ler_botao(byte botao)
 }
 void tela_inicio(void)
 {
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Bemvindo ao SHIU");
-    lcd.setCursor(3, 1);
-    lcd.print("Aperte ENTER");
+  t_eeprom ep;
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Bemvindo ao SHIU");
+  lcd.setCursor(3, 1);
+  lcd.print("Aperte ENTER");
 
-    if (digitalRead(botao_porta[ENTER])
-      tela_atual = TELA_MENU_INICIAL1;
+  if (digitalRead(botao_porta[ENTER]))
+    ep.tela_atual = TELA_MENU_INICIAL1;
 }
 void tela_menu_inicial(void)
 {
@@ -108,14 +112,14 @@ void tela_menu_inicial(void)
   lcd.setCursor(0, posicao_seta);
   lcd.print(">");
 
-  if (escolha == 1)
+  if (ep.tela_atual == TELA_MENU_INICIAL1)
   {
     lcd.setCursor(0, 2);
     lcd.print("Ver sensores");
     lcd.setCursor(1, 2);
     lcd.print("Ver potenciome");
   }
-  else if (escolha == 2)
+  else if (ep.tela_atual == TELA_MENU_INICIAL2)
   {
     lcd.setCursor(0, 2);
     lcd.print("Historico");
@@ -135,9 +139,9 @@ void tela_menu_inicial(void)
   }
   else if (ler_botao(botao_porta[DOWN]))
   {
-    if (posicao_seta == 1 %% ep.tela_atual == TELA_MENU_INICIAL1)
+    if (posicao_seta == 1 && ep.tela_atual == TELA_MENU_INICIAL1)
       ep.tela_atual = TELA_MENU_INICIAL2;
-    else (posicao_seta == 1 && ep.tela_atual == TELA_MENU_INICIAL2)
+    else if (posicao_seta == 1 && ep.tela_atual == TELA_MENU_INICIAL2)
       ep.tela_atual = TELA_MENU_INICIAL1;
 
     posicao_seta = (posicao_seta + 1) % 2;
