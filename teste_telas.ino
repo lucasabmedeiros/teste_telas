@@ -3,15 +3,19 @@
 #define TELA_INICIO 0
 #define TELA_MENU1 1
 #define TELA_MENU2 2
-#define UP 7
-#define DOWN 6
-#define ENTER 5
-#define BACK 4
+#define PORTA_UP 7
+#define PORTA_DOWN 6
+#define PORTA_ENTER 5
+#define PORTA_BACK 4
+#define INDICE_UP 0
+#define INDICE_DOWN 1
+#define INDICE_ENTER 2
+#define INDICE_BACK 3
 
 LiquidCrystal lcd(2, 3, 11, 10, 9, 8);
 
 byte tela_atual = TELA_INICIO;
-byte botao_porta[4] = {UP, DOWN, ENTER, BACK};
+byte botao_porta[4] = {PORTA_UP, PORTA_DOWN, PORTA_ENTER, PORTA_BACK};
 byte botao_estado[4] = {0};
 
 String texto_inicio[2] = 
@@ -28,6 +32,7 @@ String texto_menu[4]= {
 
 void setup()
 {
+  Serial.begin(9600);
   lcd.begin(16,2);
   lcd.noCursor();
   
@@ -46,19 +51,18 @@ void escolher_tela(void)
     	tela_inicio();
     	break;
     case TELA_MENU1:
-    	lcd.clear();
+    	lcd.setCursor(0, 0);
+    	lcd.print("          ");
      	break;
   }
 }
 void tela_inicio(void)
-{
-  byte tempo, atraso_debounce = 5;
-  
+{  
   lcd.setCursor(0, 0);
   lcd.print(texto_inicio[0]);
   lcd.setCursor(0, 1);
   lcd.print(texto_inicio[1]);
-  
-  if (digitalRead(botao_porta[ENTER]) == HIGH)
+ 
+  if (digitalRead(botao_porta[INDICE_ENTER]) == HIGH)
     tela_atual = TELA_MENU1;
 }
