@@ -55,6 +55,9 @@ void escolher_tela(void)
     case TELA_MENU1:
     	tela_menu(1);
      	break;
+    case TELA_MENU2:
+    	tela_menu(2);
+     	break;
   }
 }
 void tela_inicio(void)
@@ -92,15 +95,27 @@ void tela_menu(byte tela)
   if (digitalRead(botao_porta[INDICE_UP]))
   {
     posicao_seta = !posicao_seta;
-    posicao_escolha++;
-    if (posicao_escolha == 4)
-      posicao_escolha = 0;
+    posicao_escolha--;
+    
+    if (posicao_escolha == -1)
+    {
+      tela_atual = TELA_MENU2;
+      posicao_escolha = 3;
+    }
+    else if (posicao_escolha == 2)
+      tela_atual = TELA_MENU1;
   }
   else if (digitalRead(botao_porta[INDICE_DOWN]))
   {
     posicao_seta = !posicao_seta;
-    posicao_escolha--;
-    if (posicao_escolha == -1)
-      posicao_escolha = 3;
+    posicao_escolha++;
+    
+    if (posicao_escolha == 4)
+    {
+      tela_atual = TELA_MENU1;
+      posicao_escolha = 0;
+    }
+    else if (posicao_escolha == 2)
+      tela_atual = TELA_MENU2;
   }
 }
