@@ -50,29 +50,15 @@ void escolher_tela(void)
      	break;
   }
 }
-bool ler_botao(byte sinal)
-{
-  byte tempo, atraso_debounce = 5;
-
-  if (digitalRead(botao_porta[sinal]) == HIGH)
-    tempo = millis();
-
-  if ((millis() - tempo) > atraso_debounce)
-    if (digitalRead(botao_porta[sinal]) == HIGH)
-		return true;
-    
-  return false;
-}
 void tela_inicio(void)
 {
+  byte tempo, atraso_debounce = 5;
+  
   lcd.setCursor(0, 0);
   lcd.print(texto_inicio[0]);
   lcd.setCursor(0, 1);
   lcd.print(texto_inicio[1]);
   
-  if (ler_botao(botao_porta[ENTER]))
-  {
-    digitalWrite(13, HIGH);
+  if (digitalRead(botao_porta[ENTER]) == HIGH)
     tela_atual = TELA_MENU1;
-  }
 }
