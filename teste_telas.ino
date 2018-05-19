@@ -74,6 +74,7 @@ void escolher_tela(void)
      	break;
     case TELA_VER_SENSOR:
     	tela_ver_sensor();
+     	break;
   }
 }
 void tela_inicio(void)
@@ -135,8 +136,12 @@ void tela_menu(byte tela)
       tela_atual = TELA_MENU2;
   }
   
+  
   if (digitalRead(botao_porta[INDICE_ENTER]))
   {
+    posicao_escolha = 0;
+    posicao_seta = 0;
+    
     switch (posicao_escolha)
     {
       case 0:
@@ -179,4 +184,7 @@ void tela_ver_sensor(void)
   lcd.print("Media           ");
   lcd.setCursor(6, 1);
   lcd.print(media_total);
+  
+  if (digitalRead(botao_porta[INDICE_BACK]))
+    tela_atual = TELA_MENU1;
 }
