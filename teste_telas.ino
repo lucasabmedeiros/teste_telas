@@ -32,7 +32,7 @@ typedef struct st_eeprom
     byte tela_atual;    // adicionado para utilizar as telas
 }t_eeprom;
 
-LiquidCrystal lcd = {5, 6, 7, 8, 9, 10} // numeros arbitrarios
+LiquidCrystal lcd = {5, 6, 7, 8, 9, 10}; // numeros arbitrarios
 
 
 void setup()
