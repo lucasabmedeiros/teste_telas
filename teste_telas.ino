@@ -1,4 +1,5 @@
 #include <LiquidCrystal.h>
+#include <EEPROM.h>
 
 #define NUM_SENSOR 4
 
@@ -6,6 +7,7 @@
 #define TELA_MENU1 1
 #define TELA_MENU2 2
 #define TELA_VER_SENSOR 3
+#define VER_POT 4
 
 #define PORTA_UP 7
 #define PORTA_DOWN 6
@@ -22,6 +24,11 @@ typedef struct st_eeprom{
   bool sensor_chave[NUM_SENSOR];        
   short potenciometro_ideal[NUM_SENSOR];
 }t_eeprom;
+
+void tela_ver_sensor(void);
+void tela_menu(byte tela);
+void tela_inicio(void);
+void escolher_tela(void);
 
 LiquidCrystal lcd(2, 3, 11, 10, 9, 8);
 
@@ -48,11 +55,16 @@ String texto_menu[4]= {
 
 void setup()
 {
+  t_eeprom ep;
+  
   Serial.begin(9600);
   lcd.begin(16,2);
   lcd.noCursor();
   
-  pinMode(13, OUTPUT);
+  for (int i = 0; i < NUM_SENSOR; i++)
+  	ep.sensor_chave[i] = false;
+  
+  EEPROM.put(0, ep);
 }
 
 void loop()
@@ -74,6 +86,9 @@ void escolher_tela(void)
      	break;
     case TELA_VER_SENSOR:
     	tela_ver_sensor();
+     	break;
+    case VER_POT:
+    	//tela_ver_pot();
      	break;
   }
 }
@@ -167,6 +182,7 @@ void tela_menu(byte tela)
 void tela_ver_sensor(void)
 {
   t_eeprom ep;
+  EEPROM.get(0, ep);
   
   for (int i = 0; i < NUM_SENSOR; i++)
   {
