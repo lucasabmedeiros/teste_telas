@@ -118,4 +118,10 @@ void tela_menu(byte tela)
     else if (posicao_escolha == 2)
       tela_atual = TELA_MENU2;
   }
+  else if (digitalRead(botao_porta[INDICE_BACK]))
+  {
+    posicao_escolha = 0;
+    posicao_seta = 0;
+    tela_atual = TELA_INICIO;
+  }
 }
