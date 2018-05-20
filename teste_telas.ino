@@ -7,7 +7,7 @@
 #define TELA_MENU1 1
 #define TELA_MENU2 2
 #define TELA_VER_SENSOR 3
-#define VER_POT 4
+#define TELA_VER_POT 4
 
 #define PORTA_UP 7
 #define PORTA_DOWN 6
@@ -29,10 +29,12 @@ void tela_ver_sensor(void);
 void tela_menu(byte tela);
 void tela_inicio(void);
 void escolher_tela(void);
+void tela_ver_pot(void);
 
 LiquidCrystal lcd(2, 3, 11, 10, 9, 8);
 
 int  sensor_sinal[NUM_SENSOR]         = {10, 20, 30, 40};
+int  potenciometro_sinal[NUM_SENSOR]  = {100, 200, 300, 400};
 int  media_total                      = 25;
 
 byte tela_atual = TELA_INICIO;
@@ -41,17 +43,20 @@ byte botao_estado[4] = {0};
 byte posicao_seta = 0;
 byte posicao_escolha = 0;
 
+
 String texto_inicio[2] = 
 {
   "Bemvindo ao SHIU",
   "  Aperte ENTER  "
 };
-String texto_menu[4]= {
+String texto_menu[4]= 
+{
   "  Ver sensores  ",
   "  Ver potenciom ",
   "  Historico     ",
   "  Configuracoes "
 };
+
 
 void setup()
 {
@@ -61,8 +66,11 @@ void setup()
   lcd.begin(16,2);
   lcd.noCursor();
   
-  for (int i = 0; i < NUM_SENSOR; i++)
-  	ep.sensor_chave[i] = false;
+  for(int i=0; i<NUM_SENSOR; i++)
+  {
+    ep.sensor_chave[i]=true;
+    ep.potenciometro_ideal[i] = 540;
+  }
   
   EEPROM.put(0, ep);
 }
@@ -87,8 +95,8 @@ void escolher_tela(void)
     case TELA_VER_SENSOR:
     	tela_ver_sensor();
      	break;
-    case VER_POT:
-    	//tela_ver_pot();
+    case TELA_VER_POT:
+    	tela_ver_pot();
      	break;
   }
 }
@@ -154,9 +162,6 @@ void tela_menu(byte tela)
   
   if (digitalRead(botao_porta[INDICE_ENTER]))
   {
-    posicao_escolha = 0;
-    posicao_seta = 0;
-    
     switch (posicao_escolha)
     {
       case 0:
@@ -164,12 +169,16 @@ void tela_menu(byte tela)
       	tela_ver_sensor();
       	break;
       case 1:
+        tela_atual = TELA_VER_POT;
+      	tela_ver_pot();
       	break;
       case 2:
       	break;
       case 3:
       	break;
     }
+    posicao_escolha = 0;
+    posicao_seta = 0;    
   }
   
   if (digitalRead(botao_porta[INDICE_BACK]))
@@ -203,4 +212,24 @@ void tela_ver_sensor(void)
   
   if (digitalRead(botao_porta[INDICE_BACK]))
     tela_atual = TELA_MENU1;
+}
+void tela_ver_pot(void)
+{
+  t_eeprom ep;
+  EEPROM.get(0, ep);
+    
+  for (int i = 0; i < 4; i++)
+  {
+    lcd.setCursor(4*i, 0);
+    lcd.print(potenciometro_sinal[i]);
+    lcd.print("  ");
+  }
+  lcd.setCursor(0, 1);
+  lcd.print("Tol ");
+  lcd.print(ep.tolerancia);
+  lcd.print(" ideal ");
+  lcd.print(ep.potenciometro_ideal[0]);
+  
+  if (digitalRead(botao_porta[INDICE_BACK]))
+  	tela_atual = TELA_MENU1;
 }
