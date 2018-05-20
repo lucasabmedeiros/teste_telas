@@ -17,6 +17,7 @@
 #define TELA_MODO_VARIACAO 10
 #define TELA_POTENC_IDEAL 11
 #define TELA_RESETAR_CONFIG 12
+#define TELA_HISTORICO 13
 
 #define PORTA_UP 7
 #define PORTA_DOWN 6
@@ -110,6 +111,11 @@ String texto_modo_variacao[2] =
   " Constante      ",
   " Hora do dia    "
 };
+String texto_historico[2] = 
+{
+  "Qntd de sirenes ",
+  "                "
+};
 
 void setup()
 {
@@ -126,6 +132,7 @@ void setup()
   }
   
   ep.tolerancia = 50;
+  ep.contador = 3;
   
   EEPROM.put(0, ep);
 }
@@ -176,7 +183,11 @@ void escolher_tela(void)
     	break;
     case TELA_MODO_VARIACAO:
     	tela_modo_variacao();
-    	break;    
+    	break;
+    case TELA_HISTORICO:
+    	tela_historico();
+    	break;
+    
   }
 }
 void tela_inicio(void)
@@ -248,8 +259,9 @@ void tela_menu(byte tela)
       case 1:
         tela_atual = TELA_VER_POT;
       	break;
-    //case 2:
-    //  Por enquanto, nao ha historico a ser mostrado
+      case 2:
+    	tela_atual = TELA_HISTORICO;
+      	break;
       case 3:
       	tela_atual = TELA_CONFIG1;
       	break;
@@ -655,4 +667,26 @@ void tela_modo_variacao(void)
     
   if (digitalRead(botao_porta[INDICE_BACK]))
     tela_atual = TELA_CONFIG1;
+}
+void tela_historico(void)
+{
+  static bool limpar_linha = true;
+  t_eeprom ep;
+  EEPROM.get(0, ep);
+  
+  lcd.setCursor(0, 0);
+  lcd.print(texto_historico[0]);
+  
+  if (limpar_linha)
+  {
+  	lcd.setCursor(0, 1);
+  	lcd.print(texto_historico[1]);
+    limpar_linha = false;
+  }
+  
+  lcd.setCursor(0, 1);
+  lcd.print(ep.contador);
+  
+  if (digitalRead(botao_porta[INDICE_BACK]))
+    tela_atual = TELA_MENU1;
 }
