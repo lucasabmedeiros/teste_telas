@@ -158,12 +158,6 @@ void tela_menu(byte tela)
   lcd.setCursor(0, !posicao_seta);
   lcd.print("  ");
   
-  Serial.print("Seta: ");
-  Serial.println(posicao_seta);
-  Serial.print("Escolha: ");
-  Serial.println(posicao_escolha);
-  Serial.println("");
-  
   if (digitalRead(botao_porta[INDICE_UP]))
   {
     posicao_seta = !posicao_seta;
@@ -268,6 +262,7 @@ void tela_ver_pot(void)
 }
 void tela_config(int tela)
 {
+  Serial.println(posicao_seta);
   switch (tela)
   {
     case 1:
@@ -295,27 +290,37 @@ void tela_config(int tela)
   lcd.setCursor(0, !posicao_seta);
   lcd.print("  ");
   
-    posicao_seta = !posicao_seta;
-    posicao_escolha++;
-  
   if (digitalRead(botao_porta[INDICE_UP]))
   {
     posicao_seta = !posicao_seta;
     posicao_escolha--;
     
-    if (posicao_escolha == -1)
-    {
-      posicao_seta = 0;
-      posicao_escolha = 4;
-      tela_atual = TELA_CONFIG3;
-    }
     if (posicao_escolha == 1)
       tela_atual = TELA_CONFIG1;
     if (posicao_escolha == 3)
       tela_atual = TELA_CONFIG2;
+    
+    if (posicao_escolha == -1)
+    {
+      posicao_seta = 0;
+      posicao_escolha = 0;
+    }    
   }
   else if (digitalRead(botao_porta[INDICE_DOWN]))
   {
+    /*
+    posicao_seta = !posicao_seta;
+    posicao_escolha--;
+      
+    if (posicao_escolha == 1)
+      	tela_atual = TELA_MENU1;
+    
+    if (posicao_escolha == -1)
+    {
+      posicao_seta = 0;
+      posicao_escolha = 0;
+    }
+    */
     posicao_seta = !posicao_seta;
     posicao_escolha++;
     
@@ -323,16 +328,17 @@ void tela_config(int tela)
       tela_atual = TELA_CONFIG2;
     if (posicao_escolha == 4)
       tela_atual = TELA_CONFIG3;
+    
     if (posicao_escolha == 5)
     {
       posicao_seta = 0;
-      posicao_escolha = 0;
-      tela_atual = TELA_CONFIG1;
+      posicao_escolha = 4;
     }
   }
   
   else if (digitalRead(botao_porta[INDICE_ENTER]))
   {
+    /*
     switch (posicao_escolha)
     {
       case 0:
@@ -353,6 +359,7 @@ void tela_config(int tela)
     }
     posicao_escolha = 0;
     posicao_seta = 0;
+    */
   }
   else if (digitalRead(botao_porta[INDICE_BACK]))
   {
