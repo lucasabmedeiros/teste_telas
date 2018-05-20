@@ -2,6 +2,7 @@
 #include <EEPROM.h>
 
 #define NUM_SENSOR 4
+#define NIVEL_LIMITE 75
 
 #define TELA_INICIO 0
 #define TELA_MENU1 1
@@ -44,6 +45,8 @@ void tela_sensibilidade(void);
 void tela_sensibilidade(void);
 void tela_potenc_ideal(void);
 void mod_pot_ideal(int pot, char botao);
+void conf_padrao(void);
+void tela_resetar_config(void);
 
 
 LiquidCrystal lcd(2, 3, 11, 10, 9, 8);
@@ -90,6 +93,11 @@ String texto_potenc_ideal[2] =
   " Pt1 Pt2 Pt3 Pt4",
   "                "
 };
+String texto_resetar_config[2] = 
+{
+  "  Tem certeza?  ",
+  "   Enter Back   "
+};
 
 void setup()
 {
@@ -112,17 +120,7 @@ void setup()
 
 void loop()
 {
-  t_eeprom ep;
-  EEPROM.get(0, ep);
-  
-  escolher_tela();
-  
-  Serial.print("deu ");
-  if (ep.tolerancia == 50)
-    Serial.println("errado");
-  else
-    Serial.println("certo porra !!");
-  
+  escolher_tela();  
 }
 void escolher_tela(void)
 {
@@ -158,7 +156,10 @@ void escolher_tela(void)
     case TELA_POTENC_IDEAL:
     	tela_potenc_ideal();
     	break;
-
+	case TELA_RESETAR_CONFIG:
+    	tela_resetar_config();
+    	break;
+    
   }
 }
 void tela_inicio(void)
@@ -373,10 +374,10 @@ void tela_config(int tela)
       	break;*/
       case 3:
       	tela_atual = TELA_POTENC_IDEAL;
-      	break;/*
+      	break;
       case 4:
       	tela_atual = TELA_RESETAR_CONFIG;
-      	break;*/
+      	break;
     }
     posicao_escolha = 0;
     posicao_seta = 0;
@@ -427,7 +428,6 @@ void tela_sensibilidade(void)
     executa = false;
   }
   
-  EEPROM.put(0, ep);
   if (digitalRead(botao_porta[INDICE_BACK]))
     tela_atual = TELA_CONFIG1;
 }
@@ -517,6 +517,36 @@ void mod_pot_ideal(int pot, char botao) //modificar_potenciometro_ideal [funcao 
     ep.potenciometro_ideal[pot] = ep.potenciometro_ideal[pot] + 1;
   else if(botao=='-')
     ep.potenciometro_ideal[pot] = ep.potenciometro_ideal[pot] - 1;
+
+  EEPROM.put(0, ep);
+}
+void tela_resetar_config(void)
+{
+  lcd.setCursor(0, 0);
+  lcd.print(texto_resetar_config[0]);
+  lcd.setCursor(0, 1);
+  lcd.print(texto_resetar_config[1]);
+  
+  if (digitalRead(botao_porta[INDICE_ENTER]))
+  {
+    conf_padrao();
+    tela_atual = TELA_INICIO;
+  }
+  if (digitalRead(botao_porta[INDICE_BACK]))
+      tela_atual = TELA_CONFIG1;
+}
+void conf_padrao(void)//carrega a parte inicial do eeprom(endereco 0) com a struct das informacoes do eeprom
+{                     //modifica todas as configuracoes para "configuracoes de fabrica"
+  t_eeprom ep;
+
+  ep.contador=0;
+  ep.tolerancia = NIVEL_LIMITE;
+
+  for(int i=0; i<NUM_SENSOR; i++)
+  {
+    ep.sensor_chave[i]=true;
+    ep.potenciometro_ideal[i] = 540;
+  }
 
   EEPROM.put(0, ep);
 }
