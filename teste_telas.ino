@@ -8,6 +8,14 @@
 #define TELA_MENU2 2
 #define TELA_VER_SENSOR 3
 #define TELA_VER_POT 4
+#define TELA_CONFIG1 5
+#define TELA_CONFIG2 6
+#define TELA_CONFIG3 7
+#define TELA_SENSIBILIDADE 8
+#define TELA_SENSOR_ON_OFF 9
+#define TELA_MODO_VARIACAO 10
+#define TELA_POTENC_IDEAL 11
+#define TELA_RESETAR_CONFIG 12
 
 #define PORTA_UP 7
 #define PORTA_DOWN 6
@@ -56,6 +64,15 @@ String texto_menu[4]=
   "  Historico     ",
   "  Configuracoes "
 };
+String texto_config[6] = 
+{
+  "  Sensibilidade ",
+  "  Sensor on-off ",
+  "  Modo variacao ",
+  "  Potenc ideal  ",
+  "  Resetar config",
+  "                "
+};
 
 
 void setup()
@@ -98,6 +115,15 @@ void escolher_tela(void)
     case TELA_VER_POT:
     	tela_ver_pot();
      	break;
+    case TELA_CONFIG1:
+    	tela_config(1);
+    	break;
+    case TELA_CONFIG2:
+    	tela_config(2);
+    	break;
+    case TELA_CONFIG3:
+    	tela_config(3);
+    	break;
   }
 }
 void tela_inicio(void)
@@ -232,4 +258,99 @@ void tela_ver_pot(void)
   
   if (digitalRead(botao_porta[INDICE_BACK]))
   	tela_atual = TELA_MENU1;
+}
+void tela_config(int tela)
+{
+  switch (tela)
+  {
+    case TELA_CONFIG1:
+    	lcd.setCursor(0, 0);
+    	lcd.print(texto_config[0]);
+    	lcd.setCursor(0, 1);
+    	lcd.print(texto_config[1]);
+    	break;
+    case TELA_CONFIG2:
+    	lcd.setCursor(0, 0);
+    	lcd.print(texto_config[2]);
+    	lcd.setCursor(0, 1);
+    	lcd.print(texto_config[3]);
+    	break;
+    case TELA_CONFIG3:
+    	lcd.setCursor(0, 0);
+    	lcd.print(texto_config[4]);
+    	lcd.setCursor(0, 1);
+    	lcd.print(texto_config[5]);
+    	break;
+  }
+  
+  lcd.setCursor(0, posicao_seta);
+  lcd.print("> ");
+  lcd.setCursor(0, !posicao_seta);
+  lcd.print("  ");
+  
+    posicao_seta = !posicao_seta;
+    posicao_escolha++;
+  
+  if (digitalRead(botao_porta[INDICE_UP]))
+  {
+    posicao_seta = !posicao_seta;
+    posicao_escolha--;
+    
+    if (posicao_escolha == -1)
+    {
+      posicao_seta = 0;
+      posicao_escolha = 4;
+      tela_atual = TELA_CONFIG3;
+    }
+    if (posicao_escolha == 1)
+      tela_atual = TELA_CONFIG1;
+    if (posicao_escolha == 3)
+      tela_atual = TELA_CONFIG2;
+  }
+  else if (digitalRead(botao_porta[INDICE_DOWN]))
+  {
+    posicao_seta = !posicao_seta;
+    posicao_escolha++;
+    
+    if (posicao_escolha == 2)
+      tela_atual = TELA_CONFIG2;
+    if (posicao_escolha == 4)
+      tela_atual = TELA_CONFIG3;
+    if (posicao_escolha == 5)
+    {
+      posicao_seta = 0;
+      posicao_escolha = 0;
+      tela_atual = TELA_CONFIG1;
+    }
+  }
+  
+  else if (digitalRead(botao_porta[INDICE_ENTER]))
+  {
+    switch (posicao_escolha)
+    {
+      case 0:
+      	tela_atual = TELA_SENSIBILIDADE;
+      	break;
+      case 1:
+      	tela_atual = TELA_SENSOR_ON_OFF;
+      	break;
+      case 2:
+      	tela_atual = TELA_MODO_VARIACAO;
+      	break;
+      case 3:
+      	tela_atual = TELA_POTENC_IDEAL;
+      	break;
+      case 4:
+      	tela_atual = TELA_RESETAR_CONFIG;
+      	break;
+    }
+    posicao_escolha = 0;
+    posicao_seta = 0;
+  }
+  else if (digitalRead(botao_porta[INDICE_BACK]))
+  {
+    tela_atual = TELA_MENU1;
+    posicao_escolha = 0;
+    posicao_seta = 0;
+  }
 }
