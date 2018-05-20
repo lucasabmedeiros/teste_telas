@@ -38,6 +38,7 @@ void tela_menu(byte tela);
 void tela_inicio(void);
 void escolher_tela(void);
 void tela_ver_pot(void);
+void mod_tolerancia(char c);
 
 LiquidCrystal lcd(2, 3, 11, 10, 9, 8);
 
@@ -59,18 +60,18 @@ String texto_inicio[2] =
 };
 String texto_menu[4]= 
 {
-  "  Ver sensores  ",
-  "  Ver potenciom ",
-  "  Historico     ",
-  "  Configuracoes "
+  " Ver sensores   ",
+  " Ver potenciom  ",
+  " Historico      ",
+  " Configuracoes  "
 };
 String texto_config[6] = 
 {
-  "  Sensibilidade ",
-  "  Sensor on-off ",
-  "  Modo variacao ",
-  "  Potenc ideal  ",
-  "  Resetar config",
+  " Sensibilidade  ",
+  " Sensor on-off  ",
+  " Modo variacao  ",
+  " Potenc ideal   ",
+  " Resetar config ",
   "                "
 };
 
@@ -88,6 +89,8 @@ void setup()
     ep.sensor_chave[i]=true;
     ep.potenciometro_ideal[i] = 540;
   }
+  
+  ep.tolerancia = 50;
   
   EEPROM.put(0, ep);
 }
@@ -124,6 +127,10 @@ void escolher_tela(void)
     case TELA_CONFIG3:
     	tela_config(3);
     	break;
+    case TELA_SENSIBILIDADE:
+    	tela_sensibilidade();
+    	break;
+    
   }
 }
 void tela_inicio(void)
@@ -138,25 +145,29 @@ void tela_inicio(void)
 }
 void tela_menu(byte tela)
 {
+  mostrar_seta();
+  
   if (tela == 1)
   {
-    lcd.setCursor(2, 0);
+    lcd.setCursor(1, 0);
     lcd.print(texto_menu[0]);
-    lcd.setCursor(2, 1);
+    lcd.setCursor(1, 1);
     lcd.print(texto_menu[1]);
   }
   if (tela == 2)
   {
-    lcd.setCursor(2, 0);
+    lcd.setCursor(1, 0);
     lcd.print(texto_menu[2]);
-    lcd.setCursor(2, 1);
+    lcd.setCursor(1, 1);
     lcd.print(texto_menu[3]);
   }
   
+  /*
   lcd.setCursor(0, posicao_seta);
   lcd.print("> ");
   lcd.setCursor(0, !posicao_seta);
   lcd.print("  ");
+  */
   
   if (digitalRead(botao_porta[INDICE_UP]))
   {
@@ -262,33 +273,28 @@ void tela_ver_pot(void)
 }
 void tela_config(int tela)
 {
-  Serial.println(posicao_seta);
+  mostrar_seta();
   switch (tela)
   {
     case 1:
-    	lcd.setCursor(0, 0);
+    	lcd.setCursor(1, 0);
     	lcd.print(texto_config[0]);
-    	lcd.setCursor(0, 1);
+    	lcd.setCursor(1, 1);
     	lcd.print(texto_config[1]);
     	break;
     case 2:
-    	lcd.setCursor(0, 0);
+    	lcd.setCursor(1, 0);
     	lcd.print(texto_config[2]);
-    	lcd.setCursor(0, 1);
+    	lcd.setCursor(1, 1);
     	lcd.print(texto_config[3]);
     	break;
     case 3:
-    	lcd.setCursor(0, 0);
+    	lcd.setCursor(1, 0);
     	lcd.print(texto_config[4]);
-    	lcd.setCursor(0, 1);
+    	lcd.setCursor(1, 1);
     	lcd.print(texto_config[5]);
     	break;
   }
-  
-  lcd.setCursor(0, posicao_seta);
-  lcd.print("> ");
-  lcd.setCursor(0, !posicao_seta);
-  lcd.print("  ");
   
   if (digitalRead(botao_porta[INDICE_UP]))
   {
@@ -308,19 +314,6 @@ void tela_config(int tela)
   }
   else if (digitalRead(botao_porta[INDICE_DOWN]))
   {
-    /*
-    posicao_seta = !posicao_seta;
-    posicao_escolha--;
-      
-    if (posicao_escolha == 1)
-      	tela_atual = TELA_MENU1;
-    
-    if (posicao_escolha == -1)
-    {
-      posicao_seta = 0;
-      posicao_escolha = 0;
-    }
-    */
     posicao_seta = !posicao_seta;
     posicao_escolha++;
     
@@ -338,12 +331,12 @@ void tela_config(int tela)
   
   else if (digitalRead(botao_porta[INDICE_ENTER]))
   {
-    /*
+    
     switch (posicao_escolha)
     {
       case 0:
       	tela_atual = TELA_SENSIBILIDADE;
-      	break;
+      	break;/*
       case 1:
       	tela_atual = TELA_SENSOR_ON_OFF;
       	break;
@@ -355,11 +348,11 @@ void tela_config(int tela)
       	break;
       case 4:
       	tela_atual = TELA_RESETAR_CONFIG;
-      	break;
+      	break;*/
     }
     posicao_escolha = 0;
     posicao_seta = 0;
-    */
+    
   }
   else if (digitalRead(botao_porta[INDICE_BACK]))
   {
@@ -367,4 +360,55 @@ void tela_config(int tela)
     posicao_escolha = 0;
     posicao_seta = 0;
   }
+}
+void mostrar_seta(void)
+{
+  lcd.setCursor(0, posicao_seta);
+  lcd.print("> ");
+  lcd.setCursor(0, !posicao_seta);
+  lcd.print("  ");
+}
+void tela_sensibilidade(void)
+{
+  bool executa = false;
+  char alteracao;
+  t_eeprom ep;
+  EEPROM.get(0, ep);
+  
+  lcd.setCursor(0, 0);
+  lcd.print("Atual           ");
+  lcd.setCursor(6, 0);
+  lcd.print(ep.tolerancia);
+  lcd.setCursor(0, 1);
+  lcd.print("Aperte UP-DOWN  ");
+  
+  if (digitalRead(botao_porta[INDICE_UP]))
+  {
+    alteracao = '+';
+    executa = true;
+  }
+  else if (digitalRead(botao_porta[INDICE_DOWN]))
+  {
+    alteracao = '-';
+    executa = true;
+  }
+  
+  if (executa)
+  {
+  	mod_tolerancia(alteracao);
+    executa = false;
+  }
+}
+void mod_tolerancia(char c) //modificar_tolerancia [funcao auxiliar eeprom]
+{
+  t_eeprom ep;
+
+  EEPROM.get(0, ep);
+
+  if(c=='+')
+    ep.tolerancia = ep.tolerancia + 1;
+  else if(c=='-')
+    ep.tolerancia = ep.tolerancia - 1;
+
+  EEPROM.put(0, ep);
 }
