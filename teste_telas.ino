@@ -94,6 +94,15 @@ void setup()
 
 void loop()
 {
+  if (digitalRead(botao_porta[INDICE_UP]))
+    Serial.println("up");
+  if (digitalRead(botao_porta[INDICE_DOWN]))
+    Serial.println("down");
+  if (digitalRead(botao_porta[INDICE_ENTER]))
+    Serial.println("enter");
+  if (digitalRead(botao_porta[INDICE_BACK]))
+    Serial.println("back");
+  
   escolher_tela();
 }
 void escolher_tela(void)
@@ -192,15 +201,14 @@ void tela_menu(byte tela)
     {
       case 0:
       	tela_atual = TELA_VER_SENSOR;
-      	tela_ver_sensor();
       	break;
       case 1:
         tela_atual = TELA_VER_POT;
-      	tela_ver_pot();
       	break;
     //case 2:
     //  Por enquanto, nao ha historico a ser mostrado
       case 3:
+      	tela_atual = TELA_CONFIG1;
       	break;
     }
     posicao_escolha = 0;
@@ -263,19 +271,19 @@ void tela_config(int tela)
 {
   switch (tela)
   {
-    case TELA_CONFIG1:
+    case 1:
     	lcd.setCursor(0, 0);
     	lcd.print(texto_config[0]);
     	lcd.setCursor(0, 1);
     	lcd.print(texto_config[1]);
     	break;
-    case TELA_CONFIG2:
+    case 2:
     	lcd.setCursor(0, 0);
     	lcd.print(texto_config[2]);
     	lcd.setCursor(0, 1);
     	lcd.print(texto_config[3]);
     	break;
-    case TELA_CONFIG3:
+    case 3:
     	lcd.setCursor(0, 0);
     	lcd.print(texto_config[4]);
     	lcd.setCursor(0, 1);
