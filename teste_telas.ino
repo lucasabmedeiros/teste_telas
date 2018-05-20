@@ -47,6 +47,8 @@ void tela_potenc_ideal(void);
 void mod_pot_ideal(int pot, char botao);
 void conf_padrao(void);
 void tela_resetar_config(void);
+void mod_chave(int sensor, bool status);
+void tela_ligar_sensor(void);
 
 
 LiquidCrystal lcd(2, 3, 11, 10, 9, 8);
@@ -91,6 +93,11 @@ String texto_sensibilidade[2] =
 String texto_potenc_ideal[2] = 
 {
   " Pt1 Pt2 Pt3 Pt4",
+  "                "
+};
+String texto_ligar_sensor[2] = 
+{
+  " Sn1 Sn2 Sn3 Sn4",
   "                "
 };
 String texto_resetar_config[2] = 
@@ -158,6 +165,9 @@ void escolher_tela(void)
     	break;
 	case TELA_RESETAR_CONFIG:
     	tela_resetar_config();
+    	break;
+    case TELA_SENSOR_ON_OFF:
+    	tela_ligar_sensor();
     	break;
     
   }
@@ -365,10 +375,10 @@ void tela_config(int tela)
     {
       case 0:
       	tela_atual = TELA_SENSIBILIDADE;
-      	break;/*
+      	break;
       case 1:
       	tela_atual = TELA_SENSOR_ON_OFF;
-      	break;
+      	break;/*
       case 2:
       	tela_atual = TELA_MODO_VARIACAO;
       	break;*/
@@ -547,6 +557,81 @@ void conf_padrao(void)//carrega a parte inicial do eeprom(endereco 0) com a stru
     ep.sensor_chave[i]=true;
     ep.potenciometro_ideal[i] = 540;
   }
+
+  EEPROM.put(0, ep);
+}
+void tela_ligar_sensor(void)
+{
+  static char *seta = ">";
+  static bool iniciar_alteracao = false;
+  static bool limpar_linha = true;
+  t_eeprom ep;
+  EEPROM.get(0, ep);
+  
+  lcd.setCursor(0, 0);
+  lcd.print(texto_ligar_sensor[0]);
+  
+  if (limpar_linha)
+  {
+  	lcd.setCursor(0, 1);
+  	lcd.print(texto_ligar_sensor[1]);
+    limpar_linha = false;
+  }
+  
+  lcd.setCursor(4 * posicao_escolha, 0);
+  lcd.print(seta);
+  for (int i = 0; i < NUM_SENSOR;  i++)
+  {
+    lcd.setCursor(4 * i + 1, 1);
+    if (ep.sensor_chave[i])
+    	lcd.print(" on");
+    else
+      	lcd.print("off");
+  }
+  
+  if (!iniciar_alteracao)
+  {
+  	if (digitalRead(botao_porta[INDICE_UP]) && posicao_escolha < 3)
+    	posicao_escolha++;
+  	if (digitalRead(botao_porta[INDICE_DOWN]) && posicao_escolha > 0) 
+    	posicao_escolha--;
+  }
+  
+  if (digitalRead(botao_porta[INDICE_ENTER]))
+  {
+    seta = "#";
+    iniciar_alteracao = true;
+  }
+  
+  
+  if (iniciar_alteracao)
+  {
+    if (digitalRead(botao_porta[INDICE_UP]))
+		mod_chave(posicao_escolha, true);
+    else if (digitalRead(botao_porta[INDICE_DOWN]))
+		mod_chave(posicao_escolha, false);
+      
+    if (digitalRead(botao_porta[INDICE_BACK]))
+    {
+      seta = ">";
+      iniciar_alteracao = false;
+      posicao_escolha = 0;
+    }
+  }
+  else
+    if (digitalRead(botao_porta[INDICE_BACK]))
+  	{
+    	tela_atual = TELA_CONFIG1;
+    	limpar_linha = true;
+  	}
+}
+void mod_chave(int sensor, bool status) //modificar_chave - do sensor [funcao auxiliar eeprom]
+{
+  t_eeprom ep;
+
+  EEPROM.get(0, ep);
+
+  ep.sensor_chave[sensor] = status;
 
   EEPROM.put(0, ep);
 }
