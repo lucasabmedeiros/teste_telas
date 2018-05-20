@@ -39,6 +39,12 @@ void tela_inicio(void);
 void escolher_tela(void);
 void tela_ver_pot(void);
 void mod_tolerancia(char c);
+void tela_potenc_ideal(void);
+void tela_sensibilidade(void);
+void tela_sensibilidade(void);
+void tela_potenc_ideal(void);
+void mod_pot_ideal(int pot, char botao);
+
 
 LiquidCrystal lcd(2, 3, 11, 10, 9, 8);
 
@@ -74,7 +80,16 @@ String texto_config[6] =
   " Resetar config ",
   "                "
 };
-
+String texto_sensibilidade[2] = 
+{
+  "Atual           ",
+  "Aperte UP-DOWN  "
+};
+String texto_potenc_ideal[2] = 
+{
+  " Pt1 Pt2 Pt3 Pt4",
+  "                "
+};
 
 void setup()
 {
@@ -376,11 +391,11 @@ void tela_sensibilidade(void)
   EEPROM.get(0, ep);
   
   lcd.setCursor(0, 0);
-  lcd.print("Atual           ");
+  lcd.print(texto_sensibilidade[0]);
   lcd.setCursor(6, 0);
   lcd.print(ep.tolerancia);
   lcd.setCursor(0, 1);
-  lcd.print("Aperte UP-DOWN  ");
+  lcd.print(texto_sensibilidade[1]);
   
   if (digitalRead(botao_porta[INDICE_UP]))
   {
@@ -398,6 +413,9 @@ void tela_sensibilidade(void)
   	mod_tolerancia(alteracao);
     executa = false;
   }
+  
+  if (digitalRead(botao_porta[INDICE_BACK]))
+    tela_atual = TELA_CONFIG1;
 }
 void mod_tolerancia(char c) //modificar_tolerancia [funcao auxiliar eeprom]
 {
@@ -409,6 +427,63 @@ void mod_tolerancia(char c) //modificar_tolerancia [funcao auxiliar eeprom]
     ep.tolerancia = ep.tolerancia + 1;
   else if(c=='-')
     ep.tolerancia = ep.tolerancia - 1;
+
+  EEPROM.put(0, ep);
+}
+void tela_potenc_ideal(void)
+{
+  static char *seta = ">";
+  static bool iniciar_alteracao = false;
+  t_eeprom ep;
+  EEPROM.get(0, ep);
+  
+  lcd.setCursor(0, 0);
+  lcd.print(texto_potenc_ideal[0]);
+  lcd.setCursor(0, 1);
+  lcd.print(texto_potenc_ideal[1]);
+  
+  lcd.setCursor(4 * posicao_escolha, 0);
+  lcd.print(seta);
+  
+  for (int i = 0; i < NUM_SENSOR;  i++)
+  {
+    lcd.setCursor(4 * i, 1);
+     lcd.print(ep.potenciometro_ideal[i]);
+  }
+  
+  if (digitalRead(botao_porta[INDICE_ENTER]))
+  {
+    seta = "#";
+    iniciar_alteracao = true;
+  }
+  if (iniciar_alteracao)
+  {
+    if (digitalRead(botao_porta[INDICE_UP]))
+		mod_pot_ideal(posicao_escolha, '+');
+    else if (digitalRead(botao_porta[INDICE_DOWN]))
+      mod_pot_ideal(posicao_escolha, '-');
+      
+    if (digitalRead(botao_porta[INDICE_BACK]))
+    {
+      seta = ">";
+      iniciar_alteracao = false;
+      posicao_escolha = 0;
+    }
+  }
+  else
+    if (digitalRead(botao_porta[INDICE_BACK]))
+    	tela_atual = TELA_CONFIG1;
+}
+void mod_pot_ideal(int pot, char botao) //modificar_potenciometro_ideal [funcao auxiliar eeprom]
+{
+  t_eeprom ep;
+
+  EEPROM.get(0, ep);
+
+  if(botao=='+')
+    ep.potenciometro_ideal[pot] = ep.potenciometro_ideal[pot] + 1;
+  else if(botao=='-')
+    ep.potenciometro_ideal[pot] = ep.potenciometro_ideal[pot] - 1;
 
   EEPROM.put(0, ep);
 }
