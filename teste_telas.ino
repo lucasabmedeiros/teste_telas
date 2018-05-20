@@ -49,7 +49,7 @@ byte tela_atual = TELA_INICIO;
 byte botao_porta[4] = {PORTA_UP, PORTA_DOWN, PORTA_ENTER, PORTA_BACK};
 byte botao_estado[4] = {0};
 byte posicao_seta = 0;
-byte posicao_escolha = 0;
+int  posicao_escolha = 0;
 
 
 String texto_inicio[2] = 
@@ -94,15 +94,6 @@ void setup()
 
 void loop()
 {
-  if (digitalRead(botao_porta[INDICE_UP]))
-    Serial.println("up");
-  if (digitalRead(botao_porta[INDICE_DOWN]))
-    Serial.println("down");
-  if (digitalRead(botao_porta[INDICE_ENTER]))
-    Serial.println("enter");
-  if (digitalRead(botao_porta[INDICE_BACK]))
-    Serial.println("back");
-  
   escolher_tela();
 }
 void escolher_tela(void)
@@ -167,31 +158,39 @@ void tela_menu(byte tela)
   lcd.setCursor(0, !posicao_seta);
   lcd.print("  ");
   
+  Serial.print("Seta: ");
+  Serial.println(posicao_seta);
+  Serial.print("Escolha: ");
+  Serial.println(posicao_escolha);
+  Serial.println("");
+  
   if (digitalRead(botao_porta[INDICE_UP]))
   {
     posicao_seta = !posicao_seta;
     posicao_escolha--;
+      
+    if (posicao_escolha == 1)
+      	tela_atual = TELA_MENU1;
     
     if (posicao_escolha == -1)
     {
-      tela_atual = TELA_MENU2;
-      posicao_escolha = 3;
+      posicao_seta = 0;
+      posicao_escolha = 0;
     }
-    else if (posicao_escolha == 2)
-      tela_atual = TELA_MENU1;
   }
   else if (digitalRead(botao_porta[INDICE_DOWN]))
   {
     posicao_seta = !posicao_seta;
     posicao_escolha++;
+      
+    if (posicao_escolha == 2)
+      	tela_atual = TELA_MENU2;
     
     if (posicao_escolha == 4)
     {
-      tela_atual = TELA_MENU1;
-      posicao_escolha = 0;
+      posicao_seta = 1;
+      posicao_escolha = 3;
     }
-    else if (posicao_escolha == 2)
-      tela_atual = TELA_MENU2;
   }
   
   
