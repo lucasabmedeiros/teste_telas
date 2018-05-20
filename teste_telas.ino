@@ -35,22 +35,24 @@ typedef struct st_eeprom{
   short potenciometro_ideal[NUM_SENSOR];
 }t_eeprom;
 
-void tela_ver_sensor(void);
-void tela_menu(byte tela);
-void tela_inicio(void);
 void escolher_tela(void);
+void tela_inicio(void);
+void tela_menu(byte tela);
+void tela_ver_sensor(void);
 void tela_ver_pot(void);
+void tela_config(int tela);
+void mostrar_seta(void);
+void tela_sensibilidade(void);
 void mod_tolerancia(char c);
 void tela_potenc_ideal(void);
-void tela_sensibilidade(void);
-void tela_sensibilidade(void);
-void tela_potenc_ideal(void);
 void mod_pot_ideal(int pot, char botao);
-void conf_padrao(void);
 void tela_resetar_config(void);
-void mod_chave(int sensor, bool status);
+void conf_padrao(void);
 void tela_ligar_sensor(void);
-
+void mod_chave(int sensor, bool status);
+void tela_modo_variacao(void);
+void tela_historico(void);
+bool ler_botao(int indice);
 
 LiquidCrystal lcd(2, 3, 11, 10, 9, 8);
 
@@ -197,7 +199,7 @@ void tela_inicio(void)
   lcd.setCursor(0, 1);
   lcd.print(texto_inicio[1]);
  
-  if (digitalRead(botao_porta[INDICE_ENTER]) == HIGH)
+  if (ler_botao(INDICE_ENTER))
     tela_atual = TELA_MENU1;
 }
 void tela_menu(byte tela)
@@ -219,7 +221,7 @@ void tela_menu(byte tela)
     lcd.print(texto_menu[3]);
   }
 
-  if (digitalRead(botao_porta[INDICE_UP]))
+  if (ler_botao(INDICE_UP))
   {
     posicao_seta = !posicao_seta;
     posicao_escolha--;
@@ -233,7 +235,7 @@ void tela_menu(byte tela)
       posicao_escolha = 0;
     }
   }
-  else if (digitalRead(botao_porta[INDICE_DOWN]))
+  else if (ler_botao(INDICE_DOWN))
   {
     posicao_seta = !posicao_seta;
     posicao_escolha++;
@@ -249,7 +251,7 @@ void tela_menu(byte tela)
   }
   
   
-  if (digitalRead(botao_porta[INDICE_ENTER]))
+  if (ler_botao(INDICE_ENTER))
   {
     switch (posicao_escolha)
     {
@@ -270,7 +272,7 @@ void tela_menu(byte tela)
     posicao_seta = 0;    
   }
   
-  if (digitalRead(botao_porta[INDICE_BACK]))
+  if (ler_botao(INDICE_BACK))
   {
     posicao_escolha = 0;
     posicao_seta = 0;
@@ -299,7 +301,7 @@ void tela_ver_sensor(void)
   lcd.setCursor(6, 1);
   lcd.print(media_total);
   
-  if (digitalRead(botao_porta[INDICE_BACK]))
+  if (ler_botao(INDICE_BACK))
     tela_atual = TELA_MENU1;
 }
 void tela_ver_pot(void)
@@ -319,7 +321,7 @@ void tela_ver_pot(void)
   lcd.print(" Ideal ");
   lcd.print(ep.potenciometro_ideal[0]);
   
-  if (digitalRead(botao_porta[INDICE_BACK]))
+  if (ler_botao(INDICE_BACK))
   	tela_atual = TELA_MENU1;
 }
 void tela_config(int tela)
@@ -347,7 +349,7 @@ void tela_config(int tela)
     	break;
   }
   
-  if (digitalRead(botao_porta[INDICE_UP]))
+  if (ler_botao(INDICE_UP))
   {
     posicao_seta = !posicao_seta;
     posicao_escolha--;
@@ -363,7 +365,7 @@ void tela_config(int tela)
       posicao_escolha = 0;
     }    
   }
-  else if (digitalRead(botao_porta[INDICE_DOWN]))
+  else if (ler_botao(INDICE_DOWN))
   {
     posicao_seta = !posicao_seta;
     posicao_escolha++;
@@ -380,7 +382,7 @@ void tela_config(int tela)
     }
   }
   
-  else if (digitalRead(botao_porta[INDICE_ENTER]))
+  else if (ler_botao(INDICE_ENTER))
   {
     
     switch (posicao_escolha)
@@ -405,7 +407,7 @@ void tela_config(int tela)
     posicao_seta = 0;
     
   }
-  else if (digitalRead(botao_porta[INDICE_BACK]))
+  else if (ler_botao(INDICE_BACK))
   {
     tela_atual = TELA_MENU1;
     posicao_escolha = 0;
@@ -433,12 +435,12 @@ void tela_sensibilidade(void)
   lcd.setCursor(0, 1);
   lcd.print(texto_sensibilidade[1]);
   
-  if (digitalRead(botao_porta[INDICE_UP]))
+  if (ler_botao(INDICE_UP))
   {
     alteracao = '+';
     executa = true;
   }
-  else if (digitalRead(botao_porta[INDICE_DOWN]))
+  else if (ler_botao(INDICE_DOWN))
   {
     alteracao = '-';
     executa = true;
@@ -450,7 +452,7 @@ void tela_sensibilidade(void)
     executa = false;
   }
   
-  if (digitalRead(botao_porta[INDICE_BACK]))
+  if (ler_botao(INDICE_BACK))
     tela_atual = TELA_CONFIG1;
 }
 void mod_tolerancia(char c) //modificar_tolerancia [funcao auxiliar eeprom]
@@ -495,13 +497,13 @@ void tela_potenc_ideal(void)
   
   if (!iniciar_alteracao)
   {
-  	if (digitalRead(botao_porta[INDICE_UP]) && posicao_escolha < 3)
+  	if (ler_botao(INDICE_UP) && posicao_escolha < 3)
     	posicao_escolha++;
-  	if (digitalRead(botao_porta[INDICE_DOWN]) && posicao_escolha > 0) 
+  	if (ler_botao(INDICE_DOWN) && posicao_escolha > 0) 
     	posicao_escolha--;
   }
   
-  if (digitalRead(botao_porta[INDICE_ENTER]))
+  if (ler_botao(INDICE_ENTER))
   {
     seta = "#";
     iniciar_alteracao = true;
@@ -510,12 +512,12 @@ void tela_potenc_ideal(void)
   
   if (iniciar_alteracao)
   {
-    if (digitalRead(botao_porta[INDICE_UP]))
+    if (ler_botao(INDICE_UP))
 		mod_pot_ideal(posicao_escolha, '+');
-    else if (digitalRead(botao_porta[INDICE_DOWN]))
-      mod_pot_ideal(posicao_escolha, '-');
+    else if (ler_botao(INDICE_DOWN))
+      	mod_pot_ideal(posicao_escolha, '-');
       
-    if (digitalRead(botao_porta[INDICE_BACK]))
+    if (ler_botao(INDICE_BACK))
     {
       seta = ">";
       iniciar_alteracao = false;
@@ -523,7 +525,7 @@ void tela_potenc_ideal(void)
     }
   }
   else
-    if (digitalRead(botao_porta[INDICE_BACK]))
+    if (ler_botao(INDICE_BACK))
   	{
     	tela_atual = TELA_CONFIG1;
     	limpar_linha = true;
@@ -549,12 +551,12 @@ void tela_resetar_config(void)
   lcd.setCursor(0, 1);
   lcd.print(texto_resetar_config[1]);
   
-  if (digitalRead(botao_porta[INDICE_ENTER]))
+  if (ler_botao(INDICE_ENTER))
   {
     conf_padrao();
     tela_atual = TELA_INICIO;
   }
-  if (digitalRead(botao_porta[INDICE_BACK]))
+  if (ler_botao(INDICE_BACK))
       tela_atual = TELA_CONFIG1;
 }
 void conf_padrao(void)//carrega a parte inicial do eeprom(endereco 0) com a struct das informacoes do eeprom
@@ -603,13 +605,13 @@ void tela_ligar_sensor(void)
   
   if (!iniciar_alteracao)
   {
-  	if (digitalRead(botao_porta[INDICE_UP]) && posicao_escolha < 3)
+  	if (ler_botao(INDICE_UP) && posicao_escolha < 3)
     	posicao_escolha++;
-  	if (digitalRead(botao_porta[INDICE_DOWN]) && posicao_escolha > 0) 
+  	if (ler_botao(INDICE_DOWN) && posicao_escolha > 0) 
     	posicao_escolha--;
   }
   
-  if (digitalRead(botao_porta[INDICE_ENTER]))
+  if (ler_botao(INDICE_ENTER))
   {
     seta = "#";
     iniciar_alteracao = true;
@@ -618,12 +620,12 @@ void tela_ligar_sensor(void)
   
   if (iniciar_alteracao)
   {
-    if (digitalRead(botao_porta[INDICE_UP]))
+    if (ler_botao(INDICE_UP))
 		mod_chave(posicao_escolha, true);
-    else if (digitalRead(botao_porta[INDICE_DOWN]))
+    else if (ler_botao(INDICE_DOWN))
 		mod_chave(posicao_escolha, false);
       
-    if (digitalRead(botao_porta[INDICE_BACK]))
+    if (ler_botao(INDICE_BACK))
     {
       seta = ">";
       iniciar_alteracao = false;
@@ -631,7 +633,7 @@ void tela_ligar_sensor(void)
     }
   }
   else
-    if (digitalRead(botao_porta[INDICE_BACK]))
+    if (ler_botao(INDICE_BACK))
   	{
     	tela_atual = TELA_CONFIG1;
     	limpar_linha = true;
@@ -656,16 +658,16 @@ void tela_modo_variacao(void)
  
   mostrar_seta();
   
-  if (digitalRead(botao_porta[INDICE_UP]) && posicao_escolha == 1)
+  if (ler_botao(INDICE_UP) && posicao_escolha == 1)
     posicao_escolha = posicao_seta = 0;
-  else if (digitalRead(botao_porta[INDICE_DOWN]) && posicao_escolha == 0)
+  else if (ler_botao(INDICE_DOWN) && posicao_escolha == 0)
   	posicao_escolha = posicao_seta = 1;
   
   /* 
   	Ambos os modos ainda nao estao definidos
   */
     
-  if (digitalRead(botao_porta[INDICE_BACK]))
+  if (ler_botao(INDICE_BACK))
     tela_atual = TELA_CONFIG1;
 }
 void tela_historico(void)
@@ -687,6 +689,27 @@ void tela_historico(void)
   lcd.setCursor(0, 1);
   lcd.print(ep.contador);
   
-  if (digitalRead(botao_porta[INDICE_BACK]))
+  if (ler_botao(INDICE_BACK))
     tela_atual = TELA_MENU1;
+}
+
+bool ler_botao(int indice)
+{
+  byte atraso = 3;
+  static bool estado1, estado2;
+  static unsigned long tempo = millis();
+  
+  estado1 = digitalRead(botao_porta[indice]);
+  
+  if (millis() - tempo > atraso)
+  {
+  	estado2 = digitalRead(botao_porta[indice]);
+    
+    if (estado1 == estado2 && estado1 == HIGH)
+    {
+      tempo = millis();
+      return true;
+    }
+  }
+  return false;
 }
