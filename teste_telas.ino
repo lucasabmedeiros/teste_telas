@@ -105,6 +105,11 @@ String texto_resetar_config[2] =
   "  Tem certeza?  ",
   "   Enter Back   "
 };
+String texto_modo_variacao[2] = 
+{
+  " Constante      ",
+  " Hora do dia    "
+};
 
 void setup()
 {
@@ -169,7 +174,9 @@ void escolher_tela(void)
     case TELA_SENSOR_ON_OFF:
     	tela_ligar_sensor();
     	break;
-    
+    case TELA_MODO_VARIACAO:
+    	tela_modo_variacao();
+    	break;    
   }
 }
 void tela_inicio(void)
@@ -200,14 +207,7 @@ void tela_menu(byte tela)
     lcd.setCursor(1, 1);
     lcd.print(texto_menu[3]);
   }
-  
-  /*
-  lcd.setCursor(0, posicao_seta);
-  lcd.print("> ");
-  lcd.setCursor(0, !posicao_seta);
-  lcd.print("  ");
-  */
-  
+
   if (digitalRead(botao_porta[INDICE_UP]))
   {
     posicao_seta = !posicao_seta;
@@ -378,10 +378,10 @@ void tela_config(int tela)
       	break;
       case 1:
       	tela_atual = TELA_SENSOR_ON_OFF;
-      	break;/*
+      	break;
       case 2:
       	tela_atual = TELA_MODO_VARIACAO;
-      	break;*/
+      	break;
       case 3:
       	tela_atual = TELA_POTENC_IDEAL;
       	break;
@@ -634,4 +634,25 @@ void mod_chave(int sensor, bool status) //modificar_chave - do sensor [funcao au
   ep.sensor_chave[sensor] = status;
 
   EEPROM.put(0, ep);
+}
+void tela_modo_variacao(void)
+{
+  lcd.setCursor(1, 0);
+  lcd.print(texto_modo_variacao[0]);
+  lcd.setCursor(1, 1);
+  lcd.print(texto_modo_variacao[1]);
+ 
+  mostrar_seta();
+  
+  if (digitalRead(botao_porta[INDICE_UP]) && posicao_escolha == 1)
+    posicao_escolha = posicao_seta = 0;
+  else if (digitalRead(botao_porta[INDICE_DOWN]) && posicao_escolha == 0)
+  	posicao_escolha = posicao_seta = 1;
+  
+  /* 
+  	Ambos os modos ainda nao estao definidos
+  */
+    
+  if (digitalRead(botao_porta[INDICE_BACK]))
+    tela_atual = TELA_CONFIG1;
 }
