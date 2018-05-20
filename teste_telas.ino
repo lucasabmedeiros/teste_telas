@@ -112,7 +112,17 @@ void setup()
 
 void loop()
 {
+  t_eeprom ep;
+  EEPROM.get(0, ep);
+  
   escolher_tela();
+  
+  Serial.print("deu ");
+  if (ep.tolerancia == 50)
+    Serial.println("errado");
+  else
+    Serial.println("certo porra !!");
+  
 }
 void escolher_tela(void)
 {
@@ -145,7 +155,10 @@ void escolher_tela(void)
     case TELA_SENSIBILIDADE:
     	tela_sensibilidade();
     	break;
-    
+    case TELA_POTENC_IDEAL:
+    	tela_potenc_ideal();
+    	break;
+
   }
 }
 void tela_inicio(void)
@@ -357,10 +370,10 @@ void tela_config(int tela)
       	break;
       case 2:
       	tela_atual = TELA_MODO_VARIACAO;
-      	break;
+      	break;*/
       case 3:
       	tela_atual = TELA_POTENC_IDEAL;
-      	break;
+      	break;/*
       case 4:
       	tela_atual = TELA_RESETAR_CONFIG;
       	break;*/
@@ -414,6 +427,7 @@ void tela_sensibilidade(void)
     executa = false;
   }
   
+  EEPROM.put(0, ep);
   if (digitalRead(botao_porta[INDICE_BACK]))
     tela_atual = TELA_CONFIG1;
 }
@@ -425,30 +439,44 @@ void mod_tolerancia(char c) //modificar_tolerancia [funcao auxiliar eeprom]
 
   if(c=='+')
     ep.tolerancia = ep.tolerancia + 1;
-  else if(c=='-')
+  else if(c=='-')  
     ep.tolerancia = ep.tolerancia - 1;
-
+  
   EEPROM.put(0, ep);
+  
 }
 void tela_potenc_ideal(void)
 {
   static char *seta = ">";
   static bool iniciar_alteracao = false;
+  static bool limpar_linha = true;
   t_eeprom ep;
   EEPROM.get(0, ep);
   
   lcd.setCursor(0, 0);
   lcd.print(texto_potenc_ideal[0]);
-  lcd.setCursor(0, 1);
-  lcd.print(texto_potenc_ideal[1]);
+  
+  if (limpar_linha)
+  {
+  	lcd.setCursor(0, 1);
+  	lcd.print(texto_potenc_ideal[1]);
+    limpar_linha = false;
+  }
   
   lcd.setCursor(4 * posicao_escolha, 0);
   lcd.print(seta);
-  
   for (int i = 0; i < NUM_SENSOR;  i++)
   {
-    lcd.setCursor(4 * i, 1);
-     lcd.print(ep.potenciometro_ideal[i]);
+    lcd.setCursor(4 * i + 1, 1);
+    lcd.print(ep.potenciometro_ideal[i]);
+  }
+  
+  if (!iniciar_alteracao)
+  {
+  	if (digitalRead(botao_porta[INDICE_UP]) && posicao_escolha < 3)
+    	posicao_escolha++;
+  	if (digitalRead(botao_porta[INDICE_DOWN]) && posicao_escolha > 0) 
+    	posicao_escolha--;
   }
   
   if (digitalRead(botao_porta[INDICE_ENTER]))
@@ -456,6 +484,8 @@ void tela_potenc_ideal(void)
     seta = "#";
     iniciar_alteracao = true;
   }
+  
+  
   if (iniciar_alteracao)
   {
     if (digitalRead(botao_porta[INDICE_UP]))
@@ -472,7 +502,10 @@ void tela_potenc_ideal(void)
   }
   else
     if (digitalRead(botao_porta[INDICE_BACK]))
+  	{
     	tela_atual = TELA_CONFIG1;
+    	limpar_linha = true;
+  	}
 }
 void mod_pot_ideal(int pot, char botao) //modificar_potenciometro_ideal [funcao auxiliar eeprom]
 {
