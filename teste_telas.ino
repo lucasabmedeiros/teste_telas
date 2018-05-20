@@ -172,8 +172,8 @@ void tela_menu(byte tela)
         tela_atual = TELA_VER_POT;
       	tela_ver_pot();
       	break;
-      case 2:
-      	break;
+    //case 2:
+    //  Por enquanto, nao ha historico a ser mostrado
       case 3:
       	break;
     }
@@ -227,7 +227,7 @@ void tela_ver_pot(void)
   lcd.setCursor(0, 1);
   lcd.print("Tol ");
   lcd.print(ep.tolerancia);
-  lcd.print(" ideal ");
+  lcd.print(" Ideal ");
   lcd.print(ep.potenciometro_ideal[0]);
   
   if (digitalRead(botao_porta[INDICE_BACK]))
