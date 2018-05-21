@@ -1,6 +1,10 @@
 #include <LiquidCrystal.h>
 #include <EEPROM.h>
 
+#define NUM_SENSOR 	 4
+#define NIVEL_LIMITE 	75
+#define DELAY_BOTAO 	50
+
 #define TELA_INICIO 0
 #define TELA_MENU1 1
 #define TELA_MENU2 2
@@ -16,14 +20,15 @@
 #define TELA_POTENC_IDEAL 12
 #define TELA_RESETAR_CONFIG 13
 
-#define UP 0
-#define DOWN 1
-#define ENTER 2
-#define BACK 3
+
 #define PORTA_UP 7
 #define PORTA_DOWN 6
 #define PORTA_ENTER 5
 #define PORTA_BACK 4
+#define UP 0
+#define DOWN 1
+#define ENTER 2
+#define BACK 3
 
 typedef struct st_eeprom{
   int contador;
@@ -32,7 +37,7 @@ typedef struct st_eeprom{
   short potenciometro_ideal[NUM_SENSOR];
 }t_eeprom;
 
-/* -------------- Utilitarios ------------------- */
+/* ------- Utilitarios ---------- */
 void mostrar_seta(void);
 /*
 	Mostra na tela o icone da seta 
@@ -49,7 +54,7 @@ void limpa(byte linha);
 	Caso a flag limpar_linha seja verdadeira,
     substitui a linha indicada por espacos em branco
 */
-/* ---------------------------------------------- */
+/* ------------------------------ */
 
 
 /* ------------ Funcoes de tela ----------------- */
@@ -147,6 +152,11 @@ void conf_padrao(void);
 
 LiquidCrystal lcd(2, 3, 11, 10, 9, 8);
 
+// Variaveis do codigo original
+int  sensor_sinal[NUM_SENSOR]         = {10, 20, 30, 40};
+int  potenciometro_sinal[NUM_SENSOR]  = {100, 200, 300, 400};
+int  media_total                      = 25;
+
 // Caractere definido para a seta
 byte seta[8] = {
   B00000,
@@ -238,6 +248,32 @@ String texto_historico[2] =
 };
 /* ---------------------------------------- */
 
+void setup()
+{
+  t_eeprom ep;
+  
+  /* Inicializacao do LCD */
+  lcd.createChar(0, seta);
+  lcd.begin(16,2);
+  lcd.noCursor();
+  /* -------------------- */
+  
+  for(int i=0; i<NUM_SENSOR; i++)
+  {
+    ep.sensor_chave[i]=true;
+    ep.potenciometro_ideal[i] = 540;
+  }
+  
+  ep.tolerancia = 50;
+  ep.contador = 3;
+  
+  EEPROM.put(0, ep);
+}
+
+void loop()
+{
+  LCD_menu_start();  // Apenas essa funcao precisa ser chamada
+}
 
 /* ---------- Utilitarios -----------------*/
 void mostrar_seta(void)
@@ -300,9 +336,6 @@ bool ler_botao(int indice)
 /* --------------------------------------- */
 void LCD_menu_start(void)
 {
-  lcd.createChar(0, seta);
-  lcd.noCursor();
-
   /* Esta funcao escolhe qual sera chamada */
   switch(tela_atual)
   {
@@ -862,7 +895,7 @@ void tela_potenc_ideal(void)
   /* ------- Escolha ------- */
   if (ler_botao(ENTER))
   {
-    seta = "#";
+    icone = "#";
     iniciar_alteracao = true;
   }
   /* ----------------------- */
@@ -877,7 +910,7 @@ void tela_potenc_ideal(void)
       
     else if (ler_botao(BACK))
     {
-      seta = ">";
+      icone = ">";
       iniciar_alteracao = false;
       posicao_escolha = 0;
     }
