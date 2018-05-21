@@ -63,6 +63,16 @@ int  sensor_sinal[NUM_SENSOR]         = {10, 20, 30, 40};
 int  potenciometro_sinal[NUM_SENSOR]  = {100, 200, 300, 400};
 int  media_total                      = 25;
 
+byte seta[8] = {
+  B00000,
+  B00100,
+  B11110,
+  B11111,
+  B11110,
+  B00100,
+  B00000,
+};
+
 byte tela_atual = TELA_INICIO;
 byte botao_porta[4] = {PORTA_UP, PORTA_DOWN, PORTA_ENTER, PORTA_BACK};
 byte botao_estado[4] = {0};
@@ -126,7 +136,7 @@ void setup()
 {
   t_eeprom ep;
   
-  Serial.begin(9600);
+  lcd.createChar(0, seta);
   lcd.begin(16,2);
   lcd.noCursor();
   
@@ -150,7 +160,8 @@ void loop()
 void mostrar_seta(void)
 {
   lcd.setCursor(0, posicao_escolha%2);
-  lcd.print("> ");
+  lcd.write(byte(0));
+  lcd.print(" ");
   lcd.setCursor(0, !(posicao_escolha%2));
   lcd.print("  ");
 }
