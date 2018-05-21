@@ -25,10 +25,10 @@
 #define PORTA_DOWN 6
 #define PORTA_ENTER 5
 #define PORTA_BACK 4
-#define INDICE_UP 0
-#define INDICE_DOWN 1
-#define INDICE_ENTER 2
-#define INDICE_BACK 3
+#define UP 0
+#define DOWN 1
+#define ENTER 2
+#define BACK 3
 
 typedef struct st_eeprom{
   int contador;
@@ -202,7 +202,7 @@ void tela_inicio(void)
   lcd.setCursor(0, 1);
   lcd.print(texto_inicio[1]);
  
-  if (ler_botao(INDICE_ENTER))
+  if (ler_botao(ENTER))
     tela_atual = TELA_MENU1;
 }
 void tela_menu(byte tela)
@@ -224,7 +224,7 @@ void tela_menu(byte tela)
     lcd.print(texto_menu[3]);
   }
 
-  if (ler_botao(INDICE_UP))
+  if (ler_botao(UP))
   {
     posicao_escolha--;
       
@@ -234,7 +234,7 @@ void tela_menu(byte tela)
     if (posicao_escolha == -1)
       posicao_escolha = 0;
   }
-  else if (ler_botao(INDICE_DOWN))
+  else if (ler_botao(DOWN))
   {
     posicao_escolha++;
       
@@ -246,7 +246,7 @@ void tela_menu(byte tela)
   }
   
   
-  if (ler_botao(INDICE_ENTER))
+  if (ler_botao(ENTER))
   {
     switch (posicao_escolha)
     {
@@ -266,7 +266,7 @@ void tela_menu(byte tela)
     posicao_escolha = 0;
   }
   
-  if (ler_botao(INDICE_BACK))
+  if (ler_botao(BACK))
   {
     posicao_escolha = 0;
     tela_atual = TELA_INICIO;
@@ -297,7 +297,7 @@ void tela_ver_sensor(void)
   lcd.setCursor(6, 1);
   lcd.print(media_total);
   
-  if (ler_botao(INDICE_BACK))
+  if (ler_botao(BACK))
   {
     tela_atual = TELA_MENU1;
     limpar_linha = true;
@@ -320,7 +320,7 @@ void tela_ver_pot(void)
   lcd.print(" Ideal ");
   lcd.print(ep.potenciometro_ideal[0]);
   
-  if (ler_botao(INDICE_BACK))
+  if (ler_botao(BACK))
   	tela_atual = TELA_MENU1;
 }
 void tela_config(int tela)
@@ -348,7 +348,7 @@ void tela_config(int tela)
     	break;
   }
   
-  if (ler_botao(INDICE_UP))
+  if (ler_botao(UP))
   {
     posicao_escolha--;
     
@@ -360,7 +360,7 @@ void tela_config(int tela)
     if (posicao_escolha == -1)
 		posicao_escolha = 0; 
   }
-  else if (ler_botao(INDICE_DOWN))
+  else if (ler_botao(DOWN))
   {
     posicao_escolha++;
     
@@ -373,7 +373,7 @@ void tela_config(int tela)
       posicao_escolha = 4;
   }
   
-  else if (ler_botao(INDICE_ENTER))
+  else if (ler_botao(ENTER))
   {
     
     switch (posicao_escolha)
@@ -397,7 +397,7 @@ void tela_config(int tela)
     posicao_escolha = 0;
     
   }
-  else if (ler_botao(INDICE_BACK))
+  else if (ler_botao(BACK))
   {
     tela_atual = TELA_MENU1;
     posicao_escolha = 0;
@@ -419,12 +419,12 @@ void tela_sensibilidade(void)
   lcd.setCursor(0, 1);
   lcd.print(texto_sensibilidade[1]);
   
-  if (ler_botao(INDICE_UP))
+  if (ler_botao(UP))
   {
     alteracao = '+';
     executa = true;
   }
-  else if (ler_botao(INDICE_DOWN))
+  else if (ler_botao(DOWN))
   {
     alteracao = '-';
     executa = true;
@@ -436,7 +436,7 @@ void tela_sensibilidade(void)
     executa = false;
   }
   
-  if (ler_botao(INDICE_BACK))
+  if (ler_botao(BACK))
   {
     tela_atual = TELA_CONFIG1;
     limpar_linha = true;
@@ -478,13 +478,13 @@ void tela_potenc_ideal(void)
   
   if (!iniciar_alteracao)
   {
-  	if (ler_botao(INDICE_UP) && posicao_escolha < 3)
+  	if (ler_botao(UP) && posicao_escolha < 3)
     	posicao_escolha++;
-  	if (ler_botao(INDICE_DOWN) && posicao_escolha > 0) 
+  	if (ler_botao(DOWN) && posicao_escolha > 0) 
     	posicao_escolha--;
   }
   
-  if (ler_botao(INDICE_ENTER))
+  if (ler_botao(ENTER))
   {
     seta = "#";
     iniciar_alteracao = true;
@@ -493,19 +493,19 @@ void tela_potenc_ideal(void)
   
   if (iniciar_alteracao)
   {
-    if (ler_botao(INDICE_UP))
+    if (ler_botao(UP))
       	mod_pot_ideal(posicao_escolha, '+');
-    else if (ler_botao(INDICE_DOWN))
+    else if (ler_botao(DOWN))
       	mod_pot_ideal(posicao_escolha, '-');
       
-    else if (ler_botao(INDICE_BACK))
+    else if (ler_botao(BACK))
     {
       seta = ">";
       iniciar_alteracao = false;
       posicao_escolha = 0;
     }
   }
-  else if (ler_botao(INDICE_BACK))
+  else if (ler_botao(BACK))
   {
    	tela_atual = TELA_CONFIG1;
    	limpar_linha = true;
@@ -531,12 +531,12 @@ void tela_resetar_config(void)
   lcd.setCursor(0, 1);
   lcd.print(texto_resetar_config[1]);
   
-  if (ler_botao(INDICE_ENTER))
+  if (ler_botao(ENTER))
   {
     conf_padrao();
     tela_atual = TELA_INICIO;
   }
-  else if (ler_botao(INDICE_BACK))
+  else if (ler_botao(BACK))
     tela_atual = TELA_CONFIG1;
 }
 void conf_padrao(void)//carrega a parte inicial do eeprom(endereco 0) com a struct das informacoes do eeprom
@@ -579,13 +579,13 @@ void tela_ligar_sensor(void)
   
   if (!iniciar_alteracao)
   {
-  	if (ler_botao(INDICE_UP) && posicao_escolha < 3)
+  	if (ler_botao(UP) && posicao_escolha < 3)
     	posicao_escolha++;
-  	if (ler_botao(INDICE_DOWN) && posicao_escolha > 0) 
+  	if (ler_botao(DOWN) && posicao_escolha > 0) 
     	posicao_escolha--;
   }
   
-  if (ler_botao(INDICE_ENTER))
+  if (ler_botao(ENTER))
   {
     icone = "#";
     iniciar_alteracao = true;
@@ -594,19 +594,19 @@ void tela_ligar_sensor(void)
   
   if (iniciar_alteracao)
   {
-    if (ler_botao(INDICE_UP))
+    if (ler_botao(UP))
 		mod_chave(posicao_escolha, true);
-    else if (ler_botao(INDICE_DOWN))
+    else if (ler_botao(DOWN))
 		mod_chave(posicao_escolha, false);
       
-    if (ler_botao(INDICE_BACK))
+    if (ler_botao(BACK))
     {
       icone = ">";
       iniciar_alteracao = false;
       posicao_escolha = 0;
     }
   }
-  else if (ler_botao(INDICE_BACK))
+  else if (ler_botao(BACK))
   {
    	tela_atual = TELA_CONFIG1;
    	limpar_linha = true;
@@ -635,10 +635,10 @@ void tela_modo_variacao(void)
   	Ambos os modos ainda nao estao definidos
   */
   
-  if (ler_botao(INDICE_UP) || ler_botao(INDICE_DOWN))
+  if (ler_botao(UP) || ler_botao(DOWN))
     posicao_escolha = !posicao_escolha;
     
-  if (ler_botao(INDICE_BACK))
+  if (ler_botao(BACK))
     tela_atual = TELA_CONFIG1;
 }
 void tela_historico(void)
@@ -654,7 +654,7 @@ void tela_historico(void)
   lcd.setCursor(0, 1);
   lcd.print(ep.contador);
   
-  if (ler_botao(INDICE_BACK))
+  if (ler_botao(BACK))
   {
     tela_atual = TELA_MENU1;
     limpar_linha = true;
