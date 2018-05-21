@@ -287,7 +287,7 @@ void tela_ver_sensor(void)
       lcd.print("   ");
     }
     else
-      lcd.print("XXX ");
+      lcd.print("off ");
   }
   
   limpa(1);
@@ -498,19 +498,18 @@ void tela_potenc_ideal(void)
     else if (ler_botao(INDICE_DOWN))
       	mod_pot_ideal(posicao_escolha, '-');
       
-    if (ler_botao(INDICE_BACK))
+    else if (ler_botao(INDICE_BACK))
     {
       seta = ">";
       iniciar_alteracao = false;
       posicao_escolha = 0;
     }
   }
-  else
-    if (ler_botao(INDICE_BACK))
-  	{
-    	tela_atual = TELA_CONFIG1;
-    	limpar_linha = true;
-  	}
+  else if (ler_botao(INDICE_BACK))
+  {
+   	tela_atual = TELA_CONFIG1;
+   	limpar_linha = true;
+  }
 }
 void mod_pot_ideal(int pot, char botao) //modificar_potenciometro_ideal [funcao auxiliar eeprom]
 {
@@ -537,8 +536,8 @@ void tela_resetar_config(void)
     conf_padrao();
     tela_atual = TELA_INICIO;
   }
-  if (ler_botao(INDICE_BACK))
-      tela_atual = TELA_CONFIG1;
+  else if (ler_botao(INDICE_BACK))
+    tela_atual = TELA_CONFIG1;
 }
 void conf_padrao(void)//carrega a parte inicial do eeprom(endereco 0) com a struct das informacoes do eeprom
 {                     //modifica todas as configuracoes para "configuracoes de fabrica"
@@ -607,12 +606,11 @@ void tela_ligar_sensor(void)
       posicao_escolha = 0;
     }
   }
-  else
-    if (ler_botao(INDICE_BACK))
-  	{
-    	tela_atual = TELA_CONFIG1;
-    	limpar_linha = true;
-  	}
+  else if (ler_botao(INDICE_BACK))
+  {
+   	tela_atual = TELA_CONFIG1;
+   	limpar_linha = true;
+  }
 }
 void mod_chave(int sensor, bool status) //modificar_chave - do sensor [funcao auxiliar eeprom]
 {
