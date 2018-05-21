@@ -37,7 +37,7 @@ typedef struct st_eeprom{
   short potenciometro_ideal[NUM_SENSOR];
 }t_eeprom;
 
-void escolher_tela(void);
+void LCD_menu_start(void);
 void tela_inicio(void);
 void tela_menu(byte tela);
 void tela_ver_sensor(void);
@@ -154,7 +154,7 @@ void setup()
 
 void loop()
 {
-  escolher_tela();  
+  LCD_menu_start();  
 }
 /* ---------- Utilitarios -----------------*/
 void mostrar_seta(void)
@@ -194,7 +194,7 @@ bool ler_botao(int indice)
   return false;
 }
 /* --------------------------------------- */
-void escolher_tela(void)
+void LCD_menu_start(void)
 {
   switch(tela_atual)
   {
