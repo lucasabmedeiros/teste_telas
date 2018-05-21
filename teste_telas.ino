@@ -895,7 +895,7 @@ void tela_potenc_ideal(void)
   /* ------- Escolha ------- */
   if (ler_botao(ENTER))
   {
-    seta = "#";
+    icone = "#";
     iniciar_alteracao = true;
   }
   /* ----------------------- */
@@ -910,7 +910,7 @@ void tela_potenc_ideal(void)
       
     else if (ler_botao(BACK))
     {
-      seta = ">";
+      icone = ">";
       iniciar_alteracao = false;
       posicao_escolha = 0;
     }
