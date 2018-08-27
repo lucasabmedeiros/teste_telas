@@ -1,8 +1,3 @@
-#include <LiquidCrystal.h>
-#include <EEPROM.h>
-
-#define NUM_SENSOR 	 4
-#define NIVEL_LIMITE 	75
 #define DELAY_BOTAO 	50
 
 #define TELA_INICIO 0
